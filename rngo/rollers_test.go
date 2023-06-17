@@ -20,7 +20,7 @@ func TestSelectAdvantage(t *testing.T) {
 	//test to see of the function returns the correct number of rolls
 	//and that they select the correct rolls
 	rolls := []int{1, 2, 3, 4, 5, 6}
-	adv := selectAdvantage(rolls, 2)
+	_, adv := selectAdvantage(rolls, 2)
 
 	if len(adv) != 2 {
 		t.Errorf("Expected 2 dice, got %d", len(adv))
@@ -32,20 +32,20 @@ func TestSelectAdvantage(t *testing.T) {
 	}
 
 	//test for disadvantage
-	dis := selectAdvantage(rolls, -2)
+	_, dis := selectAdvantage(rolls, -2)
 
 	if len(dis) != 2 {
 		t.Errorf("Expected 2 dice, got %d", len(dis))
 	}
 
 	//asserts that the returned rolls are the lowest rolls, not necessarily in order
-	
-	if((dis[0] + dis[1]) != 3){
+
+	if (dis[0] + dis[1]) != 3 {
 		t.Errorf("Expected [1, 2], got %v", dis)
 	}
 
 	// test early return
-	adv = selectAdvantage(rolls, 0)
+	_, adv = selectAdvantage(rolls, 0)
 
 	if len(adv) != 6 {
 		t.Errorf("Expected 6 dice, got %d", len(adv))
@@ -58,5 +58,19 @@ func TestSelectAdvantage(t *testing.T) {
 	}
 	if sum != 21 {
 		t.Errorf("Expected [1, 2, 3, 4, 5, 6], got %v", adv)
+	}
+}
+
+func TestExplode(t *testing.T) {
+	rolls := []int{4, 6, 3}
+
+	original, result := explode(rolls, 6, 6)
+
+	if len(result) < 1 {
+		t.Errorf("Expected at least 1 rolls but got %d", len(result))
+	}
+
+	if original[0] != 4 || original[1] != 6 || original[2] != 3 {
+		t.Errorf("Expected to retain original rolls but got %v", original)
 	}
 }

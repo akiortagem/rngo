@@ -17,14 +17,14 @@ func rollNDice(nDice int, sides int) []int {
 	return rolls
 }
 
-func selectAdvantage(rolls []int, adv int) []int {
+func selectAdvantage(rolls []int, adv int) ([]int, []int) {
 	// selects the highest or lowest roll from a list of rolls
 	// positive adv keeps highest rolls, negative adv keeps lowest rolls
 	// adv = 0 returns the original list of rolls
 
 	//early return
 	if adv == 0 {
-		return rolls
+		return rolls, rolls
 	}
 
 	//first sort the rolls in descending order
@@ -32,28 +32,29 @@ func selectAdvantage(rolls []int, adv int) []int {
 
 	if adv > 0 {
 		//return the highest rolls
-		return rolls[:adv]
+		return rolls, rolls[:adv]
 	}
 	// turn the negative number into a positive number
 	adv = adv * -1
+
 	// select the lowest rolls
-	return rolls[len(rolls)-adv:]
+	return rolls, rolls[len(rolls)-adv:]
 }
 
-func explode(rolls []int, explodeOn int, sides int) []int {
+func explode(rolls []int, explodeOn int, sides int) ([]int, []int) {
 	// explodes the dice on specified number
 	// returns the original list of rolls if explodeOn is not in the list
 	// will roll the exploded dice again based on sides
 
 	//early return for explodeOn <= 0
 	if explodeOn <= 0 {
-		return rolls
+		return rolls, []int{}
 	}
 
 	explodedRolls := []int{}
 
-	//copy rolls so that we can pop and push from it
-	rollsCopy := make([]int, len(rolls))
+	//copy rolls into a stack so we can pop the first roll
+	rollsCopy := rolls
 
 	//as long as there are still rolls in the list
 	//pop the first roll and roll again
@@ -62,12 +63,15 @@ func explode(rolls []int, explodeOn int, sides int) []int {
 		roll := rollsCopy[0]
 		rollsCopy = rollsCopy[1:]
 		//roll again if the roll is equal to explodeOn
-		if roll == explodeOn {
-			explodedRolls = append(explodedRolls, rollNDice(1, sides))
+		if roll != explodeOn {
+			continue
 		}
+		newRoll := rollNDice(1, sides)[0]
+		if newRoll == explodeOn {
+			rollsCopy = append(rollsCopy, newRoll)
+		}
+		explodedRolls = append(explodedRolls, newRoll)
+	}
 
-	//combine both list
-	rolls = append(rolls, explodedRolls...)
-
-	return rolls
+	return rolls, explodedRolls
 }
